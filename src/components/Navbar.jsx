@@ -7,7 +7,7 @@ export default function Navbar() {
       <NavLink to="/" end>
         Home
       </NavLink>
-      <NavLink to="/favorites" end>
+      <NavLink to="/favorites" end style={{ marginLeft: "20px" }}>
         Favorites
       </NavLink>
     </nav>

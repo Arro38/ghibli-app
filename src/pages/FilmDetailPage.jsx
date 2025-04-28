@@ -1,5 +1,7 @@
 import { useParams } from "react-router-dom";
-export default function FilmDetailPage({ films }) {
+import useStore from "../store/store";
+export default function FilmDetailPage() {
+  const films = useStore((state) => state.films);
   const { id } = useParams();
   const film = films.find((film) => film.id === id);
   if (!film) {

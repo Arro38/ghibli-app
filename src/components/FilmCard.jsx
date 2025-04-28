@@ -1,7 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import useStore from "../store/store";
 
-export default function FilmCard({ film, toggleFavorite, isFavorite }) {
+export default function FilmCard({ film }) {
+  const toggleFavorite = useStore((state) => state.toggleFavorite);
+  const favorites = useStore((state) => state.favorites);
   return (
     <div className="film-card">
       {/* l'image, le titre, le réalisateur et l'année de sortie du film */}
@@ -11,7 +14,7 @@ export default function FilmCard({ film, toggleFavorite, isFavorite }) {
           toggleFavorite(film.id);
         }}
       >
-        {isFavorite ? "★" : "☆"}
+        {favorites.includes(film.id) ? "★" : "☆"}
       </button>
       <h3>{film.title} </h3>
       <p>Réalisateur : {film.director} </p>

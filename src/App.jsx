@@ -5,45 +5,39 @@ import HomePage from "./pages/HomePage";
 import FilmDetailPage from "./pages/FilmDetailPage";
 import FavoritePage from "./pages/FavoritePage";
 import Header from "./components/Header";
+import useStore from "./store/store";
 
 function App() {
-  const [data, setData] = useState([]);
-  const [films, setFilms] = useState([]);
-  const localFavorites = JSON.parse(localStorage.getItem("favorites"));
-  const [favorites, setFavorites] = useState([]);
   const [search, setSearch] = useState("");
   const [sortMethod, setSortMethod] = useState("");
+
+  //Zustand
+  const updateFilms = useStore((state) => state.updateFilms);
+  const films = useStore((state) => state.films);
+
   // Fonction pour récupérer les films (à compléter)
   const getFilms = async () => {
     const request = await fetch("https://ghibliapi.vercel.app/films");
     const d = await request.json();
-    setData(d);
-    setFilms(d);
+    updateFilms(d);
   };
 
-  const toggleFavorite = (filmId) => {
-    if (favorites.includes(filmId)) {
-      setFavorites(favorites.filter((id) => id !== filmId));
-    } else {
-      setFavorites([...favorites, filmId]);
-    }
-  };
   // useEffect pour charger les films au démarrage (à compléter)
   useEffect(() => {
-    getFilms();
+    if (!films.length) getFilms();
   }, []);
 
-  useEffect(() => {
-    if (search != "") {
-      var copy = [...data];
-      copy = copy.filter((film) =>
-        film.title.toLowerCase().includes(search.toLowerCase())
-      );
-      setFilms(copy);
-    } else {
-      setFilms(data);
-    }
-  }, [search]);
+  // useEffect(() => {
+  //   if (search != "") {
+  //     var copy = [...data];
+  //     copy = copy.filter((film) =>
+  //       film.title.toLowerCase().includes(search.toLowerCase())
+  //     );
+  //     updateFilms(copy);
+  //   } else {
+  //     updateFilms(data);
+  //   }
+  // }, [search]);
 
   useEffect(() => {
     if (sortMethod != "") {
@@ -55,20 +49,9 @@ function App() {
       } else if (sortMethod == "score") {
         copy = copy.sort((f1, f2) => f1.rt_score - f2.rt_score);
       }
-      setFilms(copy);
+      updateFilms(copy);
     }
   }, [sortMethod]);
-
-  useEffect(() => {
-    let jsonFavorites = JSON.stringify(favorites);
-    localStorage.setItem("favorites", jsonFavorites);
-  }, [favorites]);
-
-  useEffect(() => {
-    if (localFavorites) {
-      setFavorites(localFavorites);
-    }
-  }, []);
 
   return (
     <BrowserRouter>
@@ -76,27 +59,9 @@ function App() {
       <Header setSearch={setSearch} setSortMethod={setSortMethod} />
       <main>
         <Routes>
-          <Route
-            path="/"
-            element={
-              <HomePage
-                films={films}
-                toggleFavorite={toggleFavorite}
-                favorites={favorites}
-              />
-            }
-          />
-          <Route path="/film/:id" element={<FilmDetailPage films={films} />} />
-          <Route
-            path="/favorites"
-            element={
-              <FavoritePage
-                films={films.filter((film) => favorites.includes(film.id))}
-                toggleFavorite={toggleFavorite}
-                favorites={favorites}
-              />
-            }
-          />
+          <Route path="/" element={<HomePage />} />
+          <Route path="/film/:id" element={<FilmDetailPage />} />
+          <Route path="/favorites" element={<FavoritePage />} />
         </Routes>
       </main>
     </BrowserRouter>
